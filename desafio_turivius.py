@@ -1,6 +1,6 @@
 from Scraper import Scraper
 
-from helpers_func import format_table
+from helpers_func import format_output, extract_table_urls, extract_table_content, format_table_contents
 
 
 def desafio():
@@ -23,13 +23,24 @@ def desafio():
 
     scraper.wait(0.5)
 
-    # table_rows = scraper.find_elements_by_class_name("borda-superior")
     current_url = scraper.get_current_url()
-    df_table = scraper.extract_table_contents(current_url)
+    df_table_urls = extract_table_urls(current_url)
 
-    df_table = format_table(df_table)
+    additional_info_urls = df_table_urls['processo'].tolist()
+    additional_info_urls = [target_url+url for url in additional_info_urls]
+
+    table_contents = []
+    for url in additional_info_urls:
+        scraper.webdriver.get(url)
+        # scraper.wait(0.5)
+
+        table_contents.append(extract_table_content(url))
 
     scraper.quit_driver()
+
+    df_table_contents = format_table_contents(table_contents)
+
+    df_output = format_output(df_table_contents, df_table_urls)
 
 
 if __name__ == "__main__":
@@ -38,3 +49,4 @@ if __name__ == "__main__":
     # TODO scrapar url dos documentos
     # TODO adicionar salvamnto em arquivo
     # TODO adicionar salvamento em base
+    # TODO adicionar opção de headless scraping

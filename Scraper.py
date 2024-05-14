@@ -1,8 +1,5 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from bs4 import BeautifulSoup as bs
-import requests
-import pandas as pd
 
 
 class Scraper:
@@ -86,26 +83,3 @@ class Scraper:
         :return: url of the current working page
         """
         return self.webdriver.current_url
-
-    @staticmethod
-    def extract_table_contents(target_url):
-        """
-        extract data from all tables inside the page
-        :param target_url: url of the page containing the table
-        :return: Pandas DataFrame containing the table`s contents
-        """
-        page = requests.get(target_url)
-
-        soup = bs(page.content, "html.parser")
-
-        table = soup.find("table")
-        rows = table.find_all("tr")
-        table_data = []
-        for row in rows:
-            row_data = row.find_all("td")
-            data = [d.text for d in row_data]
-            table_data.append(data)
-
-        df_table = pd.DataFrame(table_data)
-
-        return df_table
