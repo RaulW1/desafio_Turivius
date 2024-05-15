@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchElementException
 
 
 class Scraper:
@@ -50,6 +51,32 @@ class Scraper:
         :return: instances of the elements
         """
         return self.webdriver.find_elements(By.CLASS_NAME, class_name)
+
+    def find_element_by_xpath(self, xpath: str):
+        """
+        fin element in the page by xpath
+        :param xpath: element's xpath
+        :return: instance of the element
+        """
+        return self.webdriver.find_element(By.XPATH, xpath)
+
+    def check_element_by_xpath(self, xpath: str):
+        """
+        check if element exists within current page by xpath
+        :param xpath: element's xpath
+        :return: True if element exists else False
+        """
+        try:
+            self.find_element_by_xpath(xpath)
+            return True
+        except NoSuchElementException:
+            return False
+
+    def get_current_page_source(self):
+        """
+        :return: source code of the current page
+        """
+        return self.webdriver.page_source
 
     @staticmethod
     def send_keys(element, keys: str):

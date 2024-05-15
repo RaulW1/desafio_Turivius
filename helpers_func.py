@@ -20,15 +20,13 @@ def format_table(df: pd.DataFrame):
     return df
 
 
-def extract_table_content(target_url: str):
+def extract_table_content(page_html: str):
     """
     extract data from all tables inside the page
-    :param target_url: url of the page containing the table
+    :param page_html: url of the page containing the table
     :return: Pandas DataFrame containing the table`s contents
     """
-    page = requests.get(target_url)
-
-    soup = bs(page.content, "html.parser")
+    soup = bs(page_html, "html.parser")
 
     table = soup.find("table")
     rows = table.find_all("tr")
@@ -43,15 +41,15 @@ def extract_table_content(target_url: str):
     return df_table
 
 
-def extract_table_urls(target_url: str):
+def extract_table_urls(page_html: str):
     """
     extract urls from all tables inside the page
-    :param target_url: url of the page containing the table
+    :param page_html: url of the page containing the table
     :return: Pandas DataFrame containing the table`s urls
     """
-    page = requests.get(target_url)
+    # page = requests.get(target_url)
 
-    soup = bs(page.content, "html.parser")
+    soup = bs(page_html, "html.parser")
 
     table = soup.find("table")
     rows = table.find_all("tr")
