@@ -27,6 +27,7 @@ Entrar no site  https://www.tce.sp.gov.br/jurisprudencia/ e executar uma busca e
 a cada processo bem como inforações adicionais seguindo o seguinte formato.<br>
 
 <img src="\readme_imgs\formatacao_dados.png" alt="">
+![formatacao_dados.png][\readme_imgs\formatacao_dados.png]
 
 Para executar a busca, são preenchidos os campos "Todas as Palavras" e "Exercício" (Tela 1). 
 
@@ -105,7 +106,8 @@ referentes a cada processo.
 
 Os dados são armazenados de maneira em diretório na froma de um arquivo .csv e em uma base de dados Postgresql.
 A base contem as tabelas registro, doc e materia, Onde os identificadores unicos de doc e materia são chaves 
-estrangeiras na tabela registro que contem a saída da automação.<br>
+estrangeiras na tabela registro que contem a saída da automação. As tabelas podem ser criadas executando os scripts
+dentro do diretório .\sql_scripts.<br>
 
 <h1>Separação de Ambientes:</h1>
 
