@@ -1,18 +1,24 @@
 import psycopg2
 from dotenv import load_dotenv
 import os
-from os.path import join
 
-load_dotenv('.env.dev')
+load_dotenv('.env.prod')
 
 
 class DataBase:
     def __init__(self):
+        """
+        Class responsible for connecting to the database
+        """
         self.conn = self.create_connection()
         self.cursor = self.conn.cursor()
 
     @staticmethod
     def create_connection():
+        """
+        Creates connection with the database server
+        :return: database Connection instance
+        """
         try:
             conn = psycopg2.connect(
                 host=os.getenv("HOST"),
@@ -25,18 +31,11 @@ class DataBase:
         except Exception as e:
             raise e
 
-    def execute_query(self, query: str, values: list):
-        try:
-            self.cursor.execute(query=query, vars=values)
-            data = self.cursor.fetchall()
-            self.commit()
-
-            return data
-
-        except Exception as e:
-            raise e
-
     def close_connection(self):
+        """
+        close connection with the database server
+        :return:
+        """
         try:
             self.cursor.close()
             self.conn.close()
@@ -44,12 +43,11 @@ class DataBase:
             raise e
 
     def commit(self):
+        """
+        commits transactions to the database
+        :return:
+        """
         try:
             self.conn.commit()
         except Exception as e:
             raise e
-
-
-if __name__ == "__main__":
-    db = DataBase()
-    db.close_connection()

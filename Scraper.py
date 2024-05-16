@@ -1,30 +1,35 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.options import ChromiumOptions
 from selenium.webdriver.common.by import By
-import logging
 from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
+from urllib3.exceptions import MaxRetryError
 
 
 class Scraper:
-    def __init__(self, target_url: str):
+    def __init__(self, target_url: str, headless: bool):
         """
-        Classe responsável pelas chamadas de função do Selenium
-        :param target_url:
+        Class responsible for the Selenium's API calls
+        :param target_url: target web page url
         """
         self.target_url = target_url
+        self.headless = headless
 
         # Web Driver (Chrome) setup
         self.webdriver = self.get_driver()
 
         # Web page setup
-        self.webdriver.get(self.target_url)
+        self.get(target_url)
 
-    @staticmethod
-    def get_driver():
+    def get_driver(self):
         """
         create Chrome webdriver instance
         :return: Chrome webdriver instance
         """
-        return webdriver.Chrome()
+        if self.headless:
+            options = webdriver.chrome.options.Options()
+            options.add_argument(argument="--headless=new")
+            driver = webdriver.Chrome(options=options)
+            return driver
 
     def quit_driver(self):
         """
@@ -42,6 +47,7 @@ class Scraper:
         try:
             return self.webdriver.find_element(By.NAME, name)
         except NoSuchElementException as e:
+            self.quit_driver()
             raise e
 
     def find_elements_by_name(self, name: str):
@@ -53,6 +59,7 @@ class Scraper:
         try:
             return self.webdriver.find_elements(By.NAME, name)
         except NoSuchElementException as e:
+            self.quit_driver()
             raise e
 
     def find_elements_by_class_name(self, class_name: str):
@@ -64,17 +71,21 @@ class Scraper:
         try:
             return self.webdriver.find_elements(By.CLASS_NAME, class_name)
         except NoSuchElementException as e:
+            self.quit_driver()
             raise e
 
-    def find_element_by_xpath(self, xpath: str):
+    def find_element_by_xpath(self, xpath: str, close_driver_on_fail=True):
         """
         fin element in the page by xpath
+        :param close_driver_on_fail: use False when called by self.check_element_by_xpath
         :param xpath: element's xpath
         :return: instance of the element
         """
         try:
             return self.webdriver.find_element(By.XPATH, xpath)
         except NoSuchElementException as e:
+            if close_driver_on_fail:
+                self.quit_driver()
             raise e
 
     def check_element_by_xpath(self, xpath: str):
@@ -84,7 +95,7 @@ class Scraper:
         :return: True if element exists else False
         """
         try:
-            self.find_element_by_xpath(xpath)
+            self.find_element_by_xpath(xpath, False)
             return True
         except NoSuchElementException:
             return False
@@ -95,8 +106,7 @@ class Scraper:
         """
         return self.webdriver.page_source
 
-    @staticmethod
-    def send_keys(element, keys: str):
+    def send_keys(self, element, keys: str):
         """
         Input string into text field
         :param element: element representing text field
@@ -106,10 +116,10 @@ class Scraper:
         try:
             element.send_keys(keys)
         except StaleElementReferenceException as e:
+            self.quit_driver()
             raise e
 
-    @staticmethod
-    def click(element):
+    def click(self, element):
         """
         execute the click action of a button
         :param element: element representing button
@@ -118,6 +128,7 @@ class Scraper:
         try:
             element.click()
         except StaleElementReferenceException as e:
+            self.quit_driver()
             raise e
 
     def wait(self, time: float):
@@ -133,3 +144,10 @@ class Scraper:
         :return: url of the current working page
         """
         return self.webdriver.current_url
+
+    def get(self, url: str):
+        try:
+            self.webdriver.get(url)
+        except MaxRetryError as e:
+            self.quit_driver()
+            raise e

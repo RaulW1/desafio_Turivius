@@ -8,7 +8,12 @@ from psycopg2.errors import UniqueViolation
 load_dotenv('.env.dev')
 
 
-def save_local(df_output: pd.DataFrame):
+def save_on_dir(df_output: pd.DataFrame):
+    """
+    generates output file (.json) on directory
+    :param df_output: pd.DataFrame containing the output data
+    :return:
+    """
     try:
         output_path = join(os.getenv("OUTPUT_PATH"), os.getenv("FILE_NAME"))
         df_output.to_csv(output_path)
@@ -17,6 +22,14 @@ def save_local(df_output: pd.DataFrame):
 
 
 def populate_table(db: DataBase, data: list, table: str, column: str):
+    """
+    insert new values into table if they don't already exist
+    :param db: database connection instance
+    :param data: data to be stored
+    :param table: table name which data will be inserted into
+    :param column: table's column
+    :return:
+    """
     try:
         for d in data:
             try:
@@ -37,10 +50,12 @@ def populate_table(db: DataBase, data: list, table: str, column: str):
 
 
 def insert_registro(db: DataBase, df_output: pd.DataFrame):
-    df_doc_materia = df_output[["doc", "materia"]]
-    docs = df_doc_materia["doc"].unique().tolist()
-    materias = df_doc_materia["materia"].unique().tolist()
-    registros = df_output.values.tolist()
+    """
+    insert records into table registro
+    :param db: database connection instance
+    :param df_output: pd.DataFrame containing the output data
+    :return:
+    """
     try:
         for index, row in df_output.iterrows():
             variables = (row["doc"], row["materia"], row["num_proc"], row["partes"], row["data_atuacao"], row["url"])
@@ -63,6 +78,11 @@ def insert_registro(db: DataBase, df_output: pd.DataFrame):
 
 
 def save_on_database(df_output: pd.DataFrame):
+    """
+    saves output content on database
+    :param df_output: pd.DataFrame containing the output data
+    :return:
+    """
     db = DataBase()
 
     # Inserindo dados da tabela doc. Novas instâncias de "doc" são inseridas a cada execução
@@ -78,10 +98,10 @@ def save_on_database(df_output: pd.DataFrame):
 
 
 def save_output(df_output: pd.DataFrame):
-    # save_local(df_output)
+    """
+    generates output file and saves its contents on the database
+    :param df_output: pd.DataFrame containing the output data
+    :return:
+    """
+    save_on_dir(df_output)
     save_on_database(df_output)
-
-
-if __name__ == "__main__":
-    df = pd.read_csv("output.json")
-    save_output(df)

@@ -6,22 +6,18 @@ from helpers_func import format_output, extract_table_urls, extract_table_conten
 from save_output import save_output
 
 
-def desafio():
-    target_url = "https://www.tce.sp.gov.br/jurisprudencia/"
-    search_keywords = ["fraude em escolas"]
-    exercicio = ["2023", "2022"]
-
+def desafio(target_url, search_keywords, exercicio, headless):
     try:
-        scraper = Scraper(target_url)
+        scraper = Scraper(target_url, headless)
         scraper.wait(0.5)
 
         # Buscando barra de pesquisa e inserindo key words
         search_words_element = scraper.find_element_by_name("txtTdPalvs")
-        scraper.send_keys(search_words_element, search_keywords[0])
+        scraper.send_keys(search_words_element, search_keywords)
 
         # Buscando campo "Exercício" e inserindo valores
         exercicio_element = scraper.find_element_by_name("exercicio")
-        scraper.send_keys(exercicio_element, exercicio[0] + ", " + exercicio[1])
+        scraper.send_keys(exercicio_element, exercicio)
 
         # Buscando botão "Executa" e executando busca
         execute_search_btn = scraper.find_element_by_name("acao")
@@ -59,7 +55,7 @@ def desafio():
         for url in additional_info_urls:
             # Iterando entre as páginas referentes a cada processo/documento e
             # extraindo suas respectivas informações
-            scraper.webdriver.get(url)
+            scraper.get(url)
             page_html = scraper.get_current_page_source()
             table_contents.append(extract_table_content(page_html))
 
@@ -71,37 +67,16 @@ def desafio():
         # Formatando output (merge das tabelas geradas baseado no número do processo)
         df_output = format_output(df_table_contents, df_table_urls)
 
+        # salvando o output (armazenamento em diretório e em base)
         save_output(df_output)
     except Exception as e:
         logging.exception(f"Erro durante a execução: {e}")
 
 
 if __name__ == "__main__":
-    desafio()
+    URL = "https://www.tce.sp.gov.br/jurisprudencia/"
+    KEY_WORDS = "fraude em escolas"
+    EXERCICIO = "2023, 2022"
+    HEADLESS = True
 
-    """
-    Requisitos:
-    1. Utilizar biblioteca raspagem de dados para fazer o scraping do site e extrair os
-    dados necessários. -> OK
-    
-    2. Priorizar performance na raspagem dos dados. -> OK
-    
-    3. Extrair e salvar os dados em um banco de dados (Postgresql, MySQL e etc) - OK
-    
-    4. A modelagem da tabela no banco de dados deve ser otimizada para recuperação
-    de informação baseada em data, matéria e Doc, ou seja através de index e outras
-    estruturas de recuperação de informação. - OK
-    
-    5. O código deve ser pensado de modo a ser colocado em ambiente de produção,
-    isto é com variaveis de ambiente localizadas em arquivos de separados (por
-    exemplo, .env) - OK
-    
-    6. Documentar o código de forma clara e concisa, explicando a lógica por trás das
-    ações realizadas.
-    """
-
-    # TODO adicionar comentarios
-    # TODO adicionar salvamento em base
-    # TODO adicionar opção de headless scraping
-    # TODO containerização
-    # TODO documentação
+    desafio(URL, KEY_WORDS, EXERCICIO, HEADLESS)
