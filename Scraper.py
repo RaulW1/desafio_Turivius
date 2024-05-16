@@ -1,10 +1,15 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException
+import logging
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 
 
 class Scraper:
     def __init__(self, target_url: str):
+        """
+        Classe responsável pelas chamadas de função do Selenium
+        :param target_url:
+        """
         self.target_url = target_url
 
         # Web Driver (Chrome) setup
@@ -34,7 +39,10 @@ class Scraper:
         :param name: element`s name
         :return: instance of the element
         """
-        return self.webdriver.find_element(By.NAME, name)
+        try:
+            return self.webdriver.find_element(By.NAME, name)
+        except NoSuchElementException as e:
+            raise e
 
     def find_elements_by_name(self, name: str):
         """
@@ -42,7 +50,10 @@ class Scraper:
         :param name: elements name
         :return: instances of the elements
         """
-        return self.webdriver.find_elements(By.NAME, name)
+        try:
+            return self.webdriver.find_elements(By.NAME, name)
+        except NoSuchElementException as e:
+            raise e
 
     def find_elements_by_class_name(self, class_name: str):
         """
@@ -50,7 +61,10 @@ class Scraper:
         :param class_name: elements class name
         :return: instances of the elements
         """
-        return self.webdriver.find_elements(By.CLASS_NAME, class_name)
+        try:
+            return self.webdriver.find_elements(By.CLASS_NAME, class_name)
+        except NoSuchElementException as e:
+            raise e
 
     def find_element_by_xpath(self, xpath: str):
         """
@@ -58,7 +72,10 @@ class Scraper:
         :param xpath: element's xpath
         :return: instance of the element
         """
-        return self.webdriver.find_element(By.XPATH, xpath)
+        try:
+            return self.webdriver.find_element(By.XPATH, xpath)
+        except NoSuchElementException as e:
+            raise e
 
     def check_element_by_xpath(self, xpath: str):
         """
@@ -86,7 +103,10 @@ class Scraper:
         :param keys: string to be inputted
         :return:
         """
-        element.send_keys(keys)
+        try:
+            element.send_keys(keys)
+        except StaleElementReferenceException as e:
+            raise e
 
     @staticmethod
     def click(element):
@@ -95,7 +115,10 @@ class Scraper:
         :param element: element representing button
         :return:
         """
-        element.click()
+        try:
+            element.click()
+        except StaleElementReferenceException as e:
+            raise e
 
     def wait(self, time: float):
         """
