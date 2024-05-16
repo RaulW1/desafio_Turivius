@@ -77,6 +77,6 @@ if __name__ == "__main__":
     URL = "https://www.tce.sp.gov.br/jurisprudencia/"
     KEY_WORDS = "fraude em escolas"
     EXERCICIO = "2023, 2022"
-    HEADLESS = True
+    HEADLESS = True     # Executa selenium no modo headless
 
     desafio(URL, KEY_WORDS, EXERCICIO, HEADLESS)
