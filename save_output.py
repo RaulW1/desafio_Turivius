@@ -1,11 +1,8 @@
 import pandas as pd
-from dotenv import load_dotenv
 import os
 from os.path import join
 from DataBase import DataBase
 from psycopg2.errors import UniqueViolation
-
-load_dotenv('.env.dev')
 
 
 def save_on_dir(df_output: pd.DataFrame):
